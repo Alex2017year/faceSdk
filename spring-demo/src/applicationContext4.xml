@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd">
+
+<!--    配置CustomerService  业务类-->
+    <bean id="customerService" class="demo.springaop.CustomerServiceImpl"/>
+
+<!--    切面类-->
+    <bean id="aspect" class="demo.aspectaop.CustomerServiceAspect"/>
+
+<!--    配置代理对象
+        默认情况下Spring的AOP生成的代理是JDK的Proxy实现的
+-->
+    <bean id="serviceProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <!--        接口 如果是一个接口，就可以写出value，如果是多个接口就需要配置成list-->
+        <property name="interfaces" value="demo.springaop.ICustomerService"></property>
+        <!--        目标对象 -->
+        <property name="target" ref="customerService"></property>
+        <!--        切面类 -->
+        <property name="interceptorNames" value="aspect"></property> <!-- 神奇，竟然不是ref !!! -->
+
+<!--        配置使用cglib生成代理-->
+        <property name="optimize" value="true"></property>
+    </bean>
+
+</beans>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="student" class="demo.model.Student">
+        <property name="lessons">
+<!--            list 数据注入-->
+            <list>
+                <value>English</value>
+                <value>Chinese</value>
+                <value>Math</value>
+            </list>
+        </property>
+
+<!--        set 数据注入-->
+        <property name="girlFriends">
+            <set>
+                <value>Alex</value>
+                <value>Sunny</value>
+                <value>Tom</value>
+            </set>
+        </property>
+
+<!--        map 数据注入-->
+        <property name="lessonScores">
+            <map>
+                <entry key="English" value="100"></entry>
+                <entry key="Chinese" value="200"></entry>
+                <entry key="Math" value="150"></entry>
+            </map>
+        </property>
+
+<!--        Properties 数据注入-->
+        <property name="mysqlInfos">
+            <props>
+                <prop key="url">mysql:jdbc://localhost:3306/dbname/</prop>
+                <prop key="user">root</prop>
+                <prop key="password">123456</prop>
+            </props>
+        </property>
+
+        <property name="classmates">
+            <array>
+                <value>Mike</value>
+                <value>Green</value>
+                <value>Lindy</value>
+            </array>
+        </property>
+
+    </bean>
+
+</beans>

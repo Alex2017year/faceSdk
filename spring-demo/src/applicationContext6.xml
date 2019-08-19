@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+<!--    配置CustomerService  业务类-->
+    <bean id="customerService" class="demo.springaop.CustomerServiceImpl"/>
+
+<!--    配置切面对象-->
+    <bean id="myAspect3" class="demo.aspectaop.MyAspect"></bean>
+
+<!--    配置aop-->
+    <aop:config>
+<!--        aop指定切面-->
+        <aop:aspect ref="myAspect3">
+<!--            定义切入点-->
+            <aop:pointcut id="myPointcut" expression="execution(* demo.springaop.CustomerServiceImpl.*(..))"/>
+<!--            配置前置通知-->
+<!--            <aop:before method="beforeMethod" pointcut-ref="myPointcut"></aop:before>-->
+<!--            配置后置通知-->
+            <aop:after-returning method="afterMethodReturning" pointcut-ref="myPointcut" returning="retValue"></aop:after-returning>
+<!--            配置环绕通知-->
+            <aop:around method="arroundMethod" pointcut-ref="myPointcut"></aop:around>
+
+<!--            配置异常通知
+                throwing="e" 值，方法的参数名-->
+            <aop:after-throwing method="afterThrowing" pointcut-ref="myPointcut" throwing="e"></aop:after-throwing>
+            <aop:after method="afterMethod" pointcut-ref="myPointcut"></aop:after>
+        </aop:aspect>
+    </aop:config>
+
+</beans>
