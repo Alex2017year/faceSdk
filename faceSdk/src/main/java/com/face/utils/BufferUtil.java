@@ -1,5 +1,7 @@
 package com.face.utils;
 
+import org.omg.CORBA.PUBLIC_MEMBER;
+
 import java.nio.ByteBuffer;
 import java.util.Calendar;
 
@@ -12,7 +14,33 @@ public class BufferUtil {
         return buffer.array();
     }
 
-    public static void putShort(byte b[], short s, int index) {
+    public static byte[] int2Bytes(int srcNum) {
+        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+        buffer.putInt(srcNum);
+        return buffer.array();
+    }
+
+    public static byte[] short2Bytes(short srcNum) {
+        ByteBuffer buffer = ByteBuffer.allocate(Short.BYTES);
+        buffer.putShort(srcNum);
+        return buffer.array();
+    }
+
+    public static byte[] byte2Bytes(byte srcNum) {
+        ByteBuffer buffer = ByteBuffer.allocate(Byte.BYTES);
+        buffer.put(srcNum);
+        return buffer.array();
+    }
+
+    public static byte[] string2Bytes(String str) {
+        return str.getBytes();
+    }
+
+    public static void putByte(byte[] bys, byte b, int index) {
+        bys[index] = b;
+    }
+
+    public static void putShort(byte[] b, short s, int index) {
         b[index + 1] = (byte) (s >> 8);
         b[index + 0] = (byte) (s >> 0);
     }
@@ -104,5 +132,41 @@ public class BufferUtil {
         c.setTimeInMillis(timestamp);
         return c;
     }
+
+    public static void putString(byte[] src, String str, int index) {
+        byte[] strBytes = str.getBytes();
+        arraycopy(src, index, strBytes, 0, strBytes.length);
+    }
+
+    public static short extractShort(byte[] src, int offset) {
+        if (src == null) return -1;
+        if (src.length < 2) return -1;
+
+        short result = (short) ((src[offset] & 0xFF) | ((src[offset+1] & 0xFF)<<8));
+        return result;
+    }
+
+    public static int extractInt(byte[] src, int offset) {
+        if (src == null) return -1;
+        if (src.length < 4) return -1;
+
+        int result = ((src[offset] & 0xFF)
+                   | ((src[offset+1] & 0xFF)<<8)
+                   | ((src[offset+2] & 0xFF)<<16)
+                   | ((src[offset+3] & 0xFF)<<24));
+
+        return result;
+    }
+
+    public static long extractLong(byte[] src, int offset) {
+        if (src == null) return -1;
+        if (src.length < 8) return -1;
+        ByteBuffer buffer = ByteBuffer.allocate(8);
+        buffer.put(src, offset, 8);
+        buffer.flip();//need flip
+
+        return buffer.getLong();
+    }
+
 
 }

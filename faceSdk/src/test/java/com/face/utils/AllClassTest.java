@@ -1,7 +1,12 @@
 package com.face.utils;
 
 import static org.junit.Assert.assertTrue;
+
+import com.face.model.Constants;
+import com.face.model.DeviceInfo;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 public class AllClassTest {
 
@@ -15,7 +20,6 @@ public class AllClassTest {
 
         assertTrue(new String(decryptResult).equals(content));
     }
-
 
     @Test
     public void crc16Test() {
@@ -37,6 +41,23 @@ public class AllClassTest {
         }
 
         assertTrue(result.length == 8);
-
     }
+
+    @Test
+    public void genSignatureTest() {
+        DeviceInfo deviceInfo = new DeviceInfo();
+        deviceInfo.deviceNo = 0;
+        deviceInfo.deviceTime = (int)(System.currentTimeMillis() / 1000);
+        deviceInfo.randomNum = DeviceInfo.genRandom();
+        deviceInfo.registerReason = Constants.STARTUP_REG;
+        deviceInfo.signature = DeviceInfo.genSignature(deviceInfo.randomNum, deviceInfo.deviceNo, deviceInfo.version, deviceInfo.deviceTime);
+
+        System.out.println(deviceInfo.toBytes().length);
+        System.out.println(Arrays.toString(deviceInfo.toBytes()));
+        assertTrue(deviceInfo.toBytes().length == 20);
+    }
+
+
+
+
 }
