@@ -33,7 +33,6 @@ public class Encryption {
     }
 
     private void init(byte[] keyBytes) {
-
         // 如果密钥不足16位，那么就补足
         int base = 16;
         if (keyBytes.length % base != 0) {

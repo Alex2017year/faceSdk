@@ -10,33 +10,34 @@ public class Constants {
     public final static int CONFIG_OR_HARDWARE_ERR = 0xFF;
 
     // 控制码中：分类
-    public final static int DEVICES_PARAMETER_CATEGORY = 0x01;
-    public final static int DEVICES_CONTROL_CATEGORY = 0x02;
-    public final static int DEVICES_AUTHORIZATION_CATEGORY = 0x03;
-    public final static int ACCESS_RECORD_EVENT_CATEGORY = 0x04;
-    public final static int AUTHORIZED_FACE_RECOGNITION_CATEGORY = 0x05;
-    public final static int COMPOSITE_DATA_CATEGORY = 0x06;
-    public final static int FILE_UPLOAD_CATEGORY = 0x07;
-    public final static int AUTHORIZATION_CODE_CATEGORY = 0x08;
-    public final static int UI_SET_CATEGORY = 0x09;
+    public final static byte DEVICES_PARAMETER_CATEGORY = (byte) 0x01;
+    public final static byte DEVICES_CONTROL_CATEGORY = (byte) 0x02;
+    public final static byte DEVICES_AUTHORIZATION_CATEGORY = (byte) 0x03;
+    public final static byte ACCESS_RECORD_EVENT_CATEGORY = (byte) 0x04;
+    public final static byte AUTHORIZED_FACE_RECOGNITION_CATEGORY = (byte) 0x05;
+    public final static byte COMPOSITE_DATA_CATEGORY = (byte) 0x06;
+    public final static byte FILE_UPLOAD_CATEGORY = (byte) 0x07;
+    public final static byte AUTHORIZATION_CODE_CATEGORY = (byte) 0x08;
+    public final static byte UI_SET_CATEGORY = (byte) 0x09;
+    public final static byte UNIVERSAL_CATEGORY = (byte) 0xFF; // 通用接口分类
 
     // 控制码中：命令
-    public final static int COMMAND_01 = 0x00;
-    public final static int COMMAND_02 = 0x02;
-    public final static int COMMAND_03 = 0x03;
-    public final static int COMMAND_04 = 0x04;
-    public final static int COMMAND_05 = 0x05;
-    public final static int COMMAND_06 = 0x06;
-    public final static int COMMAND_07 = 0x07;
-    public final static int COMMAND_08 = 0x08;
-    public final static int COMMAND_09 = 0x09;
-    public final static int COMMAND_0A = 0x0A;
-    public final static int COMMAND_0B = 0x0B;
-    public final static int COMMAND_0C = 0x0C;
-    public final static int COMMAND_0D = 0x0D;
-    public final static int COMMAND_0E = 0x0E;
-    public final static int COMMAND_0F = 0x0F;
-    public final static int COMMAND_10 = 0x10;
+    public final static byte COMMAND_01 = (byte) 0x00;
+    public final static byte COMMAND_02 = (byte) 0x02;
+    public final static byte COMMAND_03 = (byte) 0x03;
+    public final static byte COMMAND_04 = (byte) 0x04;
+    public final static byte COMMAND_05 = (byte) 0x05;
+    public final static byte COMMAND_06 = (byte) 0x06;
+    public final static byte COMMAND_07 = (byte) 0x07;
+    public final static byte COMMAND_08 = (byte) 0x08;
+    public final static byte COMMAND_09 = (byte) 0x09;
+    public final static byte COMMAND_0A = (byte) 0x0A;
+    public final static byte COMMAND_0B = (byte) 0x0B;
+    public final static byte COMMAND_0C = (byte) 0x0C;
+    public final static byte COMMAND_0D = (byte) 0x0D;
+    public final static byte COMMAND_0E = (byte) 0x0E;
+    public final static byte COMMAND_0F = (byte) 0x0F;
+    public final static byte COMMAND_10 = (byte) 0x10;
 
     // 注册原因
     public final static short STARTUP_REG = 0x00;

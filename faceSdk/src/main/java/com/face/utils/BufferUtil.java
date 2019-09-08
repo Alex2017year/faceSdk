@@ -104,12 +104,12 @@ public class BufferUtil {
         return getPartBytes(src, startIdx, endIdx-startIdx);
     }
 
-    public byte[] append(byte[] bytes1, byte[] bytes2){
-        byte[] bytes3 = new byte[bytes1.length+bytes2.length];
-        arraycopy(bytes1, 0, bytes3, 0, bytes1.length);
-        arraycopy(bytes2, 0, bytes3, bytes1.length, bytes2.length);
 
-        return bytes3;
+    public static boolean append(byte[] src, int offset, byte[] paddingBytes) {
+        if (src == null || paddingBytes == null) return false;
+        if (src.length - offset < paddingBytes.length) return false;
+        arraycopy(src, offset, paddingBytes, 0, paddingBytes.length);
+        return true;
     }
 
     public static byte[] concat(byte[]... arrays) {
@@ -120,9 +120,16 @@ public class BufferUtil {
         byte[] result = new byte[length];
         byte pos = 0;
         for (byte[] array : arrays) {
-            System.arraycopy(array, 0, result, pos, array.length);
+            arraycopy(array, 0, result, pos, array.length);
             pos += array.length;
         }
+        return result;
+    }
+
+    public static byte[] extractBytes(byte[] src, int offset, int length) {
+        if (src == null || length <= 0 ) return null;
+        byte[] result = new byte[length];
+        arraycopy(src, offset, result, 0, length);
         return result;
     }
 
