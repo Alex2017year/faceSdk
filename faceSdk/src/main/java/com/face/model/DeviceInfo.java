@@ -21,7 +21,6 @@ public class DeviceInfo {
     }
 
     public static byte[] genSignature(short randomNum, int deviceNo, byte version, int deviceTime) {
-
         byte[] result = new byte[30];
 
         BufferUtil.putShort(result, randomNum, 0); // 2
@@ -33,9 +32,8 @@ public class DeviceInfo {
         return result;
     }
 
-    public byte[] toBytes() {
+    public byte[] msgtoBuffer() {
         if (signature == null) return null;
-
         byte[] result = null;
         byte[] intBytes1 = BufferUtil.int2Bytes(deviceNo);
         byte[] bytes1 = BufferUtil.byte2Bytes(registerReason);

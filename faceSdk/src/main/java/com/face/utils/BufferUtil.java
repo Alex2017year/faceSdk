@@ -145,6 +145,14 @@ public class BufferUtil {
         arraycopy(src, index, strBytes, 0, strBytes.length);
     }
 
+    public static byte extractByte(byte[] src, int offset) {
+        if (src == null) return -1;
+        if (src.length < 1) return -1;
+
+        byte result = src[offset];
+        return result;
+    }
+
     public static short extractShort(byte[] src, int offset) {
         if (src == null) return -1;
         if (src.length < 2) return -1;

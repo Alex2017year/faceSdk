@@ -25,10 +25,20 @@ public class Encryption {
                                                0x30, 0x36, 0x30, 0x37, 0x30, 0x38 };
 
     private byte[] keyBytes = null;
+    private byte[] ivBytes = null;
 
     public Encryption() {}
 
-    public Encryption(byte[] keyBytes) {
+    public Encryption(byte[] keyBytes, byte[] ivBytes) {
+        this.keyBytes = keyBytes;
+        this.ivBytes = ivBytes;
+    }
+
+    void setIvBytes(byte[] ivBytes) {
+        this.ivBytes = ivBytes;
+    }
+
+    void setKeyBytes(byte[] keyBytes) {
         this.keyBytes = keyBytes;
     }
 
@@ -69,7 +79,10 @@ public class Encryption {
         byte[] encryptedData = null;
         init(keyBytes);
         try {
-            cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(ivBytes));
+            if (ivBytes != null)
+                cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(ivBytes));
+            else
+                cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(DEFAULT_IV));
             encryptedData = cipher.doFinal(content);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -85,7 +98,8 @@ public class Encryption {
      * @return : 加密结果
      */
     public byte[] encrypt(byte[] content, byte[] keyBytes) {
-        return encrypt(content, keyBytes, DEFAULT_IV);
+        if (ivBytes == null)  return encrypt(content, keyBytes, DEFAULT_IV);
+        else return encrypt(content, keyBytes, ivBytes);
     }
 
     /**
@@ -95,9 +109,9 @@ public class Encryption {
      */
     public byte[] encrypt(byte[] content) {
         if (this.keyBytes == null) return null;
-        return encrypt(content, this.keyBytes, DEFAULT_IV);
+        if (ivBytes == null) return encrypt(content, this.keyBytes, DEFAULT_IV);
+        else return encrypt(content, this.keyBytes, this.ivBytes);
     }
-
 
     /**
      * 解密算法
