@@ -52,15 +52,7 @@ public class VCardMessageDecoder extends LengthFieldBasedFrameDecoder {
         // 首先，需要进行解密
         byte[] bytes = new byte[frame.readableBytes()];
         frame.readBytes(bytes);
-
-        byte[] ivs = BufferUtil.lastBytes(bytes, ConfigInfo.IVS_COUNT);
-        if (ivs == null)
-            return null;
-
-        byte[] plaintext = Pkcs7Encoder.decryptOfDiyIV(bytes, ConfigInfo.getCommKey().getBytes(), ivs);
-        if (plaintext == null)
-            return null;
-
+        byte[] plaintext = decrypt(bytes);
         frame = Unpooled.copiedBuffer(plaintext);
         frame.markReaderIndex();
 
@@ -91,10 +83,11 @@ public class VCardMessageDecoder extends LengthFieldBasedFrameDecoder {
         // 获取应用数据部分
         int len = frame.readableBytes() - (HEADER_SIZE + CRC_CODE_SIZE);
         ByteBuf body = frame.copy(HEADER_SIZE, len);
+        message.setAppData(body);
 
         // 忽略response中的crc16校验码
 
-        return null;
+        return message;
     }
 
     private boolean verifyCrc16(byte[] data) {
@@ -104,7 +97,7 @@ public class VCardMessageDecoder extends LengthFieldBasedFrameDecoder {
             return false;
         int originCrc16CodeInt = getInt(originCrc16Code);
 
-        // 计算收到数据的crc16
+        // 计算收到数据的crc169
         byte[] allDataBytes = BufferUtil.subBytes(data, 0, data.length - CRC_CODE_SIZE);
         int genCrc16code = calcCRC16(allDataBytes);
 
@@ -112,6 +105,18 @@ public class VCardMessageDecoder extends LengthFieldBasedFrameDecoder {
         if (genCrc16code != originCrc16CodeInt)
             return false;
         return true;
+    }
+
+    private byte[] decrypt(byte[] ciphertext) {
+        byte[] ivs = BufferUtil.lastBytes(ciphertext, ConfigInfo.IVS_COUNT);
+        if (ivs == null)
+            return null;
+
+        byte[] plaintext = Pkcs7Encoder.decryptOfDiyIV(ciphertext, ConfigInfo.getCommKey().getBytes(), ivs);
+        if (plaintext == null)
+            return null;
+
+        return plaintext;
     }
 
 }

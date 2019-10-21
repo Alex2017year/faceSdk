@@ -9,5 +9,8 @@
         <module name="VcardServer" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="VcardServer" target="8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
