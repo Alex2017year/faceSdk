@@ -25,7 +25,9 @@ public class VCardMessageDecoder extends LengthFieldBasedFrameDecoder {
     public static final int LENGTH_ADJUSTMENT = 0;
     public static final int INITIAL_BYTES_TO_STRIP = 0;
 
-    private static final int MIX_SIZE = 14;
+    private static final int MIX_SIZE = 14; // 数据最小大小
+    private static final int HEADER_SIZE = 12; //固定协议头大小
+    private static final int CRC_CODE_SIZE = 2; // 校验码大小
 
     public VCardMessageDecoder(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength) {
         super(maxFrameLength, lengthFieldOffset, lengthFieldLength);
@@ -60,23 +62,13 @@ public class VCardMessageDecoder extends LengthFieldBasedFrameDecoder {
             return null;
 
         frame = Unpooled.copiedBuffer(plaintext);
+        frame.markReaderIndex();
 
         // 然后，进行校验
         bytes = new byte[frame.readableBytes()];
         frame.readBytes(bytes);
-        byte[] originCrc16Code = new byte[16];
-        originCrc16Code = BufferUtil.lastBytes(bytes, 16);
-        if (originCrc16Code == null || bytes.length < 16)
+        if (!verifyCrc16(bytes))
             return null;
-
-        byte[] allDataBytes = new byte[bytes.length - 16];
-        int genCrc16code = calcCRC16(allDataBytes);
-        int originCrc16CodeInt = getInt(originCrc16Code);
-
-        // 不相等，校验不通过
-        if (genCrc16code != originCrc16CodeInt)
-            return null;
-
 
         // 最后，开始解析数据
         // 此处需要把应用数据部分转化为 ByteBuf 设置到Body里面
@@ -96,9 +88,30 @@ public class VCardMessageDecoder extends LengthFieldBasedFrameDecoder {
         header.setControlCode(controlCode);
         message.setHeader(header);
 
+        // 获取应用数据部分
+        int len = frame.readableBytes() - (HEADER_SIZE + CRC_CODE_SIZE);
+        ByteBuf body = frame.copy(HEADER_SIZE, len);
 
+        // 忽略response中的crc16校验码
 
         return null;
+    }
+
+    private boolean verifyCrc16(byte[] data) {
+        // 获取数据包中的crc16
+        byte[] originCrc16Code = BufferUtil.lastBytes(data, CRC_CODE_SIZE);
+        if (originCrc16Code == null || data.length < MIX_SIZE)
+            return false;
+        int originCrc16CodeInt = getInt(originCrc16Code);
+
+        // 计算收到数据的crc16
+        byte[] allDataBytes = BufferUtil.subBytes(data, 0, data.length - CRC_CODE_SIZE);
+        int genCrc16code = calcCRC16(allDataBytes);
+
+        // 根据两个crc16进行判断是否相等
+        if (genCrc16code != originCrc16CodeInt)
+            return false;
+        return true;
     }
 
 }
