@@ -26,6 +26,7 @@ public class Encryption {
 
     private byte[] keyBytes = null;
     private byte[] ivBytes = null;
+    private byte[] decryptedData;
 
     public Encryption() {}
 
@@ -125,7 +126,7 @@ public class Encryption {
         init(keyBytes);
         try {
             cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(ivBytes));
-            decryptedData = cipher.doFinal(encryptedData);
+            decryptedData = decryptedData;
         } catch (Exception ex) {
             ex.printStackTrace();
         }

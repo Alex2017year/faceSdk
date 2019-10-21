@@ -7,6 +7,8 @@ import com.face.utils.TimeUtil;
 
 // 用于向服务器发起注册请求
 // 做成单例模式
+
+// 这里需要完成一个服务器端的需求。。
 public class LoginSystem {
 
     private static LoginSystem instance = null;
@@ -21,8 +23,8 @@ public class LoginSystem {
     private LoginSystem() {
         mCommandMsg = new VcardMessage(true);
         mCommandMsg.setDeviceId(0);
-        mCommandMsg.setCategoryCode(Constants.UNIVERSAL_CATEGORY);
-        mCommandMsg.setCommandCode(Constants.COMMAND_01);
+        mCommandMsg.setCategoryCode(Constants.ControlCategory.UNIVERSAL_CATEGORY);
+        mCommandMsg.setCommandCode(Constants.CommandCategory.COMMAND_01);
         mCommandMsg.setCmdIndex(cmdIndex);
         // mCommandMsg.setData(new byte[]{(byte) 0x14});
 

@@ -12,7 +12,7 @@ public class MD5Util {
             int temp;
             StringBuffer sb=new StringBuffer("");
             for ( int offset = 0; offset <encryptStr.length ; offset++ ) {
-                temp=encryptStr [offset];
+                temp=encryptStr[offset];
                 if(temp<0) temp+=256;
                 if(temp<16) sb.append("0");
                 sb.append(Integer.toHexString(temp));
