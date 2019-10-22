@@ -3,15 +3,12 @@ package com.lingyan;
 import com.lingyan.handler.ChannelInitializerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,7 +44,6 @@ public class NettyServer {
                 .childOption(ChannelOption.SO_KEEPALIVE, true);
 
         mServerChannel = bootstrap.bind(mHost, mPort).sync().channel();
-
 
         // log.info("Success to launch server...");
     }
