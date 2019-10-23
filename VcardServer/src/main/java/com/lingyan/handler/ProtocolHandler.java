@@ -20,9 +20,6 @@ public class ProtocolHandler implements IProtocolHandler {
         return ProtocolHandlerInstance.INSTANCE;
     }
 
-    /// data for all known remote devices
-    private Map<Integer, DeviceData> devices;
-
     /// commands from the ***Handler waiting to be executed
     private BlockingQueue<VCardMessage> commands;
 
@@ -32,17 +29,25 @@ public class ProtocolHandler implements IProtocolHandler {
 
     @Override
     public boolean SendData(VCardMessage telegram) {
-        return false;
+        try {
+            commands.put(telegram);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
 
+    // 向外抛出数据
     @Override
     public VCardEvent GetData() {
         return null;
     }
 
+    // 向队列中添加数据
     @Override
     public void SetData(VCardEvent event) {
 
     }
-
 }

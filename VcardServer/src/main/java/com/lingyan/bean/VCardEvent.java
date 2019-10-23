@@ -17,7 +17,7 @@ public class VCardEvent {
 
     // 事件类型
     public enum EventType {
-        UNDEFINED((byte) 0),
+        UNDEFINED((byte) 0), // 未定义
         TELEGRAM((byte) 1), // 相当于设备回复请求
         DEVICE_STATUS((byte) 2); // 设备主动上报
 

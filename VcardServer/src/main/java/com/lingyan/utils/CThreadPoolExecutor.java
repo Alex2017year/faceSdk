@@ -1,12 +1,10 @@
 package com.lingyan.utils;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CThreadPoolExecutor {
+    // private static final String TAG = CThreadPoolExecutor.class.getSimpleName();
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();// CPU个数
     private static final int CORE_POOL_SIZE = Math.max(2, Math.min(CPU_COUNT - 1, 4));// 线程池中核心线程的数量
     private static final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2 + 1;// 线程池中最大线程数量
@@ -14,6 +12,7 @@ public class CThreadPoolExecutor {
     private static final int WAIT_COUNT = 128; // 最多排队个数，这里控制线程创建的频率
 
     private static ThreadPoolExecutor pool = createThreadPoolExecutor();
+
     private static ThreadPoolExecutor createThreadPoolExecutor() {
         if (pool == null) {
             pool = new ThreadPoolExecutor(
@@ -25,10 +24,10 @@ public class CThreadPoolExecutor {
                     new CThreadFactory("CThreadPool", Thread.NORM_PRIORITY - 2),
                     new CHandlerException());
         }
-
         return pool;
     }
 
+    // 线程池工厂
     public static class CThreadFactory implements ThreadFactory {
         private AtomicInteger counter = new AtomicInteger(1);
         private String prefix = "";
@@ -58,12 +57,12 @@ public class CThreadPoolExecutor {
 
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-            // Tips.showForce("任务被拒绝", 5000);
+            // Log.d(TAG, "rejectedExecution:" + r);
+            // Log.e(TAG, logAllThreadStackTrace().toString());
             if (!pool.isShutdown()) {
                 pool.shutdown();
                 pool = null;
             }
-
             pool = createThreadPoolExecutor();
         }
     }
@@ -94,7 +93,6 @@ public class CThreadPoolExecutor {
         return jobsForUI.submit(task);
     }
 
-
     /**
      * 强制清理任务
      *
@@ -119,112 +117,22 @@ public class CThreadPoolExecutor {
         try {
             return future.get();
         } catch (Exception e) {
-             // Log.e(tag, (name != null ? name + ": " : "") + e.toString());
+            // Log.e(tag, (name != null ? name + ": " : "") + e.toString());
         }
         return null;
     }
 
+    /**
+     * 创建一个运行在后台的线程
+     *
+     * @param runnable
+     */
     public static void runInBackground(Runnable runnable) {
         if (pool == null) {
             createThreadPoolExecutor();
         }
-
         pool.execute(runnable);
     }
-
-    private static Thread mainThread;
-    private static Handler mainHandler;
-
-    static {
-        Looper mainLooper = Looper.getMainLooper();
-        mainThread = mainLooper.getThread();
-        mainHandler = new Handler(mainLooper);
-    }
-
-    public static boolean isOnMainThread() {
-        return mainThread == Thread.currentThread();
-    }
-
-    public static void runOnMainThread(Runnable r) {
-        if (isOnMainThread()) {
-            r.run();
-        } else {
-            mainHandler.post(r);
-        }
-    }
-
-    public static void runOnMainThread(Runnable r, long delayMillis) {
-        if (delayMillis <= 0) {
-            runOnMainThread(r);
-        } else {
-            mainHandler.postDelayed(r, delayMillis);
-        }
-    }
-
-    // 用于记录后台等待的Runnable，第一个参数外面的Runnable，第二个参数是等待中的Runnable
-    private static HashMap<Runnable, Runnable> mapToMainHandler = new HashMap<Runnable, Runnable>();
-
-    public static void runInBackground(final Runnable runnable, long delayMillis) {
-        if (delayMillis <= 0) {
-            runInBackground(runnable);
-        } else {
-            Runnable mainRunnable = new Runnable() {
-
-                @Override
-                public void run() {
-                    mapToMainHandler.remove(runnable);
-                    pool.execute(runnable);
-                }
-            };
-
-            mapToMainHandler.put(runnable, mainRunnable);
-            mainHandler.postDelayed(mainRunnable, delayMillis);
-        }
-    }
-
-    /**
-     * 对runOnMainThread的，移除Runnable
-     *
-     * @param r
-     */
-    public static void removeCallbackOnMainThread(Runnable r) {
-        mainHandler.removeCallbacks(r);
-    }
-
-    public static void removeCallbackInBackground(Runnable runnable) {
-        Runnable mainRunnable = mapToMainHandler.get(runnable);
-        if (mainRunnable != null) {
-            mainHandler.removeCallbacks(mainRunnable);
-        }
-    }
-
-    public static void logStatus() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("getActiveCount");
-        sb.append(pool.getActiveCount());
-        sb.append("\ngetTaskCount");
-        sb.append(pool.getTaskCount());
-        sb.append("\ngetCompletedTaskCount");
-        sb.append(pool.getCompletedTaskCount());
-        // Log.d(TAG, sb.toString());
-    }
-
-    public static StringBuilder logAllThreadStackTrace() {
-        StringBuilder builder = new StringBuilder();
-        Map<Thread, StackTraceElement[]> liveThreads = Thread.getAllStackTraces();
-        for (Iterator<Thread> i = liveThreads.keySet().iterator(); i.hasNext(); ) {
-            Thread key = i.next();
-            builder.append("Thread ").append(key.getName())
-                    .append("\n");
-            StackTraceElement[] trace = liveThreads.get(key);
-            for (int j = 0; j < trace.length; j++) {
-                builder.append("\tat ").append(trace[j]).append("\n");
-            }
-        }
-        return builder;
-    }
-
-
 
 
 }

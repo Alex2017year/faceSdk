@@ -20,8 +20,12 @@ public class ChannelInitializerHandler extends ChannelInitializer<SocketChannel>
                 LENGTH_FIELD_LENGTH, LENGTH_ADJUSTMENT, INITIAL_BYTES_TO_STRIP, true));
         pipeline.addLast("decoder", new VCardMessageEncoder());
         pipeline.addLast("readTimeoutHandler", new ReadTimeoutHandler(50));
+        // 握手认证消息处理handler
         pipeline.addLast(new LoginAuthRespHandler());
-        pipeline.addFirst("heartBeatHandler", new HeartBeatRespHandler());
+        // 心跳消息响应处理handler
+        pipeline.addLast("heartBeatHandler", new HeartBeatRespHandler());
+        // 接收消息处理handler
+        pipeline.addLast(new NettyServerHandler());
 
     }
 }
