@@ -1,4 +1,4 @@
-package com.lingyan.cryption;
+package com.lingyan.utils.cryption;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Arrays;

@@ -20,7 +20,7 @@ public class BufferUtil {
             return null;
 
         byte[] result = new byte[count];
-        System.arraycopy(src, src.length-count, result, 0, count);
+        System.arraycopy(src, src.length - count, result, 0, count);
         return result;
     }
 
@@ -36,5 +36,16 @@ public class BufferUtil {
     }
 
 
+    public static int calcuatePacketLength(int dataLength) {
+        int totalPacketLenght = 0;
+        if ((dataLength + 6) % 16 == 0) {
+            totalPacketLenght = dataLength + 6 + 16;
+        } else {
+            totalPacketLenght = ((dataLength + 6) / 16 + 1) * 16;
+        }
+
+        totalPacketLenght += 8;
+        return totalPacketLenght;
+    }
 
 }

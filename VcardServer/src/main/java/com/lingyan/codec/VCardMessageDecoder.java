@@ -1,7 +1,9 @@
 package com.lingyan.codec;
 
-import com.lingyan.config.ConfigInfo;
-import com.lingyan.cryption.Pkcs7Encoder;
+import com.lingyan.bean.DeviceData;
+import com.lingyan.global.config.ConfigInfo;
+import com.lingyan.utils.cryption.Pkcs7Encoder;
+import com.lingyan.handler.ProtocolHandler;
 import com.lingyan.protocol.ControlCode;
 import com.lingyan.protocol.MessageHeader;
 import com.lingyan.protocol.VCardMessage;
@@ -13,7 +15,7 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
 import java.nio.ByteOrder;
 
-import static com.lingyan.cryption.CRC16Util.calcCRC16;
+import static com.lingyan.utils.cryption.CRC16Util.calcCRC16;
 import static com.lingyan.utils.BufferUtil.getInt;
 
 
@@ -41,7 +43,6 @@ public class VCardMessageDecoder extends LengthFieldBasedFrameDecoder {
         super(byteOrder, maxFrameLength, lengthFieldOffset, lengthFieldLength, lengthAdjustment, initialBytesToStrip, failFast);
     }
 
-
     @Override
     protected Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
         if (in == null || in.readableBytes() < MIX_SIZE)
@@ -52,7 +53,19 @@ public class VCardMessageDecoder extends LengthFieldBasedFrameDecoder {
         // 首先，需要进行解密
         byte[] bytes = new byte[frame.readableBytes()];
         frame.readBytes(bytes);
-        byte[] plaintext = decrypt(bytes);
+
+        // 查看是否相应的ivs
+        byte[] ivs = null;
+        DeviceData dd = ProtocolHandler.getInstance().find(ctx.channel());
+        if (dd == null) {
+            ivs = BufferUtil.lastBytes(bytes, ConfigInfo.IVS_COUNT);
+            dd = new DeviceData();
+            dd.setKeyIV(ivs);
+        } else {
+            ivs = dd.getKeyIV();
+        }
+
+        byte[] plaintext = decrypt(bytes, ivs);
         frame = Unpooled.copiedBuffer(plaintext);
         frame.markReaderIndex();
 
@@ -90,7 +103,7 @@ public class VCardMessageDecoder extends LengthFieldBasedFrameDecoder {
         return message;
     }
 
-    private boolean verifyCrc16(byte[] data) {
+    private static boolean verifyCrc16(byte[] data) {
         // 获取数据包中的crc16
         byte[] originCrc16Code = BufferUtil.lastBytes(data, CRC_CODE_SIZE);
         if (originCrc16Code == null || data.length < MIX_SIZE)
@@ -107,15 +120,11 @@ public class VCardMessageDecoder extends LengthFieldBasedFrameDecoder {
         return true;
     }
 
-    private byte[] decrypt(byte[] ciphertext) {
-        byte[] ivs = BufferUtil.lastBytes(ciphertext, ConfigInfo.IVS_COUNT);
+    private static byte[] decrypt(byte[] ciphertext, byte[] ivs) {
         if (ivs == null)
             return null;
 
         byte[] plaintext = Pkcs7Encoder.decryptOfDiyIV(ciphertext, ConfigInfo.getCommKey().getBytes(), ivs);
-        if (plaintext == null)
-            return null;
-
         return plaintext;
     }
 

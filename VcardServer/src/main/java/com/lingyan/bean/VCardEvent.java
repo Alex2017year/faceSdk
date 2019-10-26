@@ -1,11 +1,11 @@
 package com.lingyan.bean;
 
-import com.lingyan.global.Constant;
+import com.lingyan.global.Constants;
 import com.lingyan.protocol.VCardMessage;
 
 public class VCardEvent {
 
-    public VCardEvent(int deviceId, Constant.ConnectionStatus status) {
+    public VCardEvent(int deviceId, Constants.ConnectionStatus status) {
         this.deviceId = deviceId;
         this.status = status;
     }
@@ -13,7 +13,14 @@ public class VCardEvent {
     public VCardEvent(int deviceId, VCardMessage message) {
         this.deviceId = deviceId;
         this.message = message;
+        this.ackRequestId = message.getHeader().getCmdSequence();
+
     }
+
+    private int deviceId;
+    private short ackRequestId;
+    Constants.ConnectionStatus status;
+    VCardMessage message;
 
     // 事件类型
     public enum EventType {
@@ -27,12 +34,6 @@ public class VCardEvent {
         }
     }
 
-    private int deviceId;
-    private boolean acknowledge;
-    Constant.ConnectionStatus status;
-    VCardMessage message;
-
-
     public int getDeviceId() {
         return deviceId;
     }
@@ -41,19 +42,19 @@ public class VCardEvent {
         this.deviceId = deviceId;
     }
 
-    public boolean isAcknowledge() {
-        return acknowledge;
+    public short getAckRequestId() {
+        return ackRequestId;
     }
 
-    public void setAcknowledge(boolean acknowledge) {
-        this.acknowledge = acknowledge;
+    public void setAckRequestId(short ackRequestId) {
+        this.ackRequestId = ackRequestId;
     }
 
-    public Constant.ConnectionStatus getStatus() {
+    public Constants.ConnectionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Constant.ConnectionStatus status) {
+    public void setStatus(Constants.ConnectionStatus status) {
         this.status = status;
     }
 
@@ -69,7 +70,7 @@ public class VCardEvent {
     public String toString() {
         return "VCardEvent{" +
                 "deviceId=" + deviceId +
-                ", acknowledge=" + acknowledge +
+                ", ackRequestId=" + ackRequestId +
                 ", status=" + status +
                 ", message=" + message +
                 '}';

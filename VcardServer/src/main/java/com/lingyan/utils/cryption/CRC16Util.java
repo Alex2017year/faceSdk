@@ -1,4 +1,4 @@
-package com.lingyan.cryption;
+package com.lingyan.utils.cryption;
 
 /******************************************************************************
  *  Compilation:  javac CRC16.java

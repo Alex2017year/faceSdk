@@ -1,4 +1,4 @@
-package com.lingyan.cryption;
+package com.lingyan.utils.cryption;
 import java.security.MessageDigest;
 
 public abstract class MD5Util {

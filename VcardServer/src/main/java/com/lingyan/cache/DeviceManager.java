@@ -1,6 +1,5 @@
 package com.lingyan.cache;
 
-import com.lingyan.protocol.VCardMessage;
 import io.netty.channel.Channel;
 
 import java.util.Map;
