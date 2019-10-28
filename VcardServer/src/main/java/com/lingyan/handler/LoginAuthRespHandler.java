@@ -30,6 +30,7 @@ public class LoginAuthRespHandler extends ChannelHandlerAdapter {
 
                 // 此处需要统一进行处理比较稳妥
                 // 统一构建一个response处理方法
+                //  TODO: 统一写一个response的响应
                 loginResp = buildResponse();
             }
         }

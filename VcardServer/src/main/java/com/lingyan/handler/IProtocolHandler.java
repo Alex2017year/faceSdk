@@ -14,5 +14,5 @@ public interface IProtocolHandler {
     void addNewDevice(Channel channel, VCardMessage message);
     void dealDeviceData(Channel channel, VCardMessage message);
     boolean sendData(VCardMessage telegram);
-    VCardEvent getData();
+    VCardEvent getData() throws InterruptedException;
 }

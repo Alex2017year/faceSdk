@@ -11,6 +11,7 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class ProtocolHandler implements IProtocolHandler {
 
@@ -27,17 +28,23 @@ public class ProtocolHandler implements IProtocolHandler {
 
     /// telegram and status events waiting for pickup by
     /// the ***Handler
-    private BlockingQueue<VCardEvent> events;
+    private BlockingQueue<VCardEvent> events = new LinkedBlockingQueue<>();
 
     // 设备信息表
     // deviceId <---> DeviceData
     private Map<Integer, DeviceData> deviceTable = new ConcurrentHashMap<>();
 
+    // channel <---> DeviceData
     private Map<Channel, DeviceData> channelDeviceIdTable = new ConcurrentHashMap<>();
 
     @Override
     public void removeBadDevice(Channel channel) {
-
+        if (channelDeviceIdTable.containsKey(channel)) {
+            DeviceData dd = channelDeviceIdTable.remove(channel);
+            if (deviceTable.containsKey(dd.getDeviceId())) {
+                deviceTable.remove(dd.getDeviceId());
+            }
+        }
     }
 
     @Override
@@ -45,13 +52,25 @@ public class ProtocolHandler implements IProtocolHandler {
         if (channelDeviceIdTable.containsKey(channel)) {
             return channelDeviceIdTable.get(channel);
         }
-
         return null;
     }
 
     @Override
     public void addNewDevice(Channel channel, VCardMessage message) {
+        // 首次出现的设备
+        if (!channelDeviceIdTable.containsKey(channel)) {
+            DeviceData deviceData = new DeviceData(message.getHeader().getDeviceId());
+            deviceData.setStatus(Constants.ConnectionStatus.HEALTHY);
 
+            deviceData.setChannel(channel);
+            InetSocketAddress address = (InetSocketAddress) channel.localAddress();
+            deviceData.setCurIPAddress(new IPAddressPair(address.getHostName(), address.getPort()));
+
+            channelDeviceIdTable.put(channel, deviceData);
+            deviceTable.put(deviceData.getDeviceId(), deviceData);
+
+            setData(new VCardEvent(deviceData.getDeviceId(), message, true));
+        }
     }
 
     // 仅仅处理已经正常通信的数据
@@ -103,13 +122,18 @@ public class ProtocolHandler implements IProtocolHandler {
     }
 
     // 向外抛出数据
+    // 外界线程中不断进行读取操作
     @Override
-    public VCardEvent getData() {
-        return null;
+    public VCardEvent getData() throws InterruptedException {
+        return events.take();
     }
 
     // 向队列中添加数据
     public void setData(VCardEvent event) {
-
+        try {
+            events.put(event);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
