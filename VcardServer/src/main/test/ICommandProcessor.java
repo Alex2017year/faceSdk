@@ -1,3 +1,4 @@
+import com.lingyan.bean.AuthorizationCardInfo;
 import com.sun.org.apache.regexp.internal.RE;
 
 import java.util.ArrayList;
@@ -87,5 +88,12 @@ public interface ICommandProcessor {
 
     // 授权卡
     void requestClearAllAuthorizationCard(int deviceId);
+    void requestReadSingleAuthorizationCard(int deviceId, long cardId);
+    void requestAddAuthorizationCard(int deviceId, AuthorizationCardInfo[] cardInfo);
+    void requestDeleteAuthorizationCard(int deviceId, long[] cardId);
+    void requestDeleteAuthorizationCardByPersonId(int deviceId, int[] personId);
+
+    // 通行记录&事件
+
 
 }

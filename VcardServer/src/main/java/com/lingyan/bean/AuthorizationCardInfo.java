@@ -103,7 +103,9 @@ public class AuthorizationCardInfo {
 
     public void setPermission(byte openDoorPermission, byte specialPermission) {
         // 将两个特殊的位进行合并操作
-        this.permission =
+        this.permission = (byte) (((specialPermission << 4) & BIT_FLAG) | (this.permission & BIT_FLAG));
+        this.openDoorPermission = openDoorPermission;
+        this.specialPermission = specialPermission;
     }
 
     public byte getOpenDoorPermission() {
